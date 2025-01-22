@@ -143,7 +143,7 @@
                     <option value="jpg">JPG (Anciennement JPEG)</option>
                     <option value="png">PNG</option>
                     <option value="webp">WEBP</option>
-                    <option value="pdf">PDF</option>
+                    <option value="pdf">PDF</option>  
                 </select>
                 
                 <button type="submit" class="btn">Convertir</button>
@@ -194,7 +194,7 @@
                 }
             };
 
-            reader.readAsDataURL(fileInput); 
+            reader.readAsDataURL(fileInput); // Lire le fichier
         });
 
         async function convertPdfToImage(pdfDataUrl, format) {
