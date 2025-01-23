@@ -1,129 +1,129 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="./images/th.jpg">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script src="https://unpkg.com/pdf-lib@1.16.0"></script>
-    <title>Convertisseur de format d'images</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            background-color: #f4f4f4;
-            background-image: url('./images/dark_night_sky_with_moon_stars_optimized.png');
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-size: cover;
+<!DOCTYPE html> <!-- Type du doc -->
+<html lang="fr"> <!-- Langue du doc -->
+<head> <!-- En-tête du doc -->
+    <meta charset="UTF-8"> <!-- Encodage du doc -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Affichage sur mobile ?? -->
+    <link rel="icon" type="image/png" href="./images/th.jpg">  <!-- Icone du doc dans l'en-tête -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- Importation de la librairie jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script> <!-- Importation de la librairie pdf.js -->
+    <script src="https://unpkg.com/pdf-lib@1.16.0"></script> <!-- Importation de la librairie pdf-lib -->
+    <title>Convertisseur de format d'images</title> <!-- Titre du doc dans l'en-tête -->
+    <style> /* Ouverture de la balise style */
+        body { /* Sélecteur de style du body */
+            margin: 0; /* Marge (extérieur) du body */
+            padding: 0; /* Padding (intérieur) du body */
+            font-family: Arial, sans-serif; /* Police du texte (liste des deux à prioriser) */
+            height: 100vh; /* Hauteur du body en vh pour adapter à tout style d'écran */
+            background-color: #f4f4f4; /* Couleur de fond du body (caché par l'image) */
+            background-image: url('./images/dark_night_sky_with_moon_stars_optimized.png'); /* Image du bg */
+            background-position: center center; /* Position de l'image de bg */
+            background-repeat: no-repeat; /* Empêche la répétition de l'image de bg */
+            background-attachment: fixed; /* Empêche le défilement de l'image de bg */
+            background-size: cover; /* Taille de l'image du bg, ici prends tout l'espace dispo */
         }
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
+        .container { /* Sélecteur de style de la classe container */
+            display: flex; /* Flexbox pour faciliter le placement des éléments */
+            justify-content: center; /* Centre horizontalement les éléments */
+            align-items: center; /* Centre verticalement les éléments, avec justify-content, permet de placer au centre de la page */
+            height: 100%; /* Hauteur du container */
         }
-        .form-container {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 3%;
-            border-radius: 0.5rem;
-            text-align: center;
-            box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-            margin-bottom: 15%;
+        .form-container { /* Sélecteur de style de la classe form-container */
+            background-color: rgba(255, 255, 255, 0.9); /* Couleur de fond du container */
+            padding: 3%; /* Padding global */
+            border-radius: 0.5rem; /* Bordure arrondie de 0.5rem (en css, relative à la taille de police de la racine) */
+            text-align: center; /* Aligne le texte au centre */
+            box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2); /* petite ombre autour du container */
+            margin-bottom: 15%; /* Marge en bas */
         }
-        h1 {
-            margin-bottom: 2%;
-            font-size: 2.4%;
+        h1 { /* Sélecteur de style de la balise h1 */
+            margin-bottom: 2%; /* Marge en bas */
+            font-size: 2.4%; /* Taille de police */
         }
-        input, select {
-            width: 100%;
-            padding: 1%;
-            margin: 1% 0;
-            border-radius: 0.5rem;
-            border: 0.1rem solid #ccc;
+        input, select { /* Sélecteur de style des balises input et select */
+            width: 100%; /* Largeur de input et select */
+            padding: 1%; /* Padding global */
+            margin: 1% 0; /* Marge en haut et en bas de 1% et 0 aux deux autres */
+            border-radius: 0.5rem; /* Bordure arrondie */
+            border: 0.1rem solid #ccc; /* Bordure solide avec couleur */
         }
-        .btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 1% 2%;
-            border-radius: 0.5rem;
-            cursor: pointer;
+        .btn { /* Sélecteur de style de la classe btn */
+            background-color: #007bff; /* Couleur de fond du bouton */
+            color: white; /* Couleur du texte */
+            border: none; /* Pas de bordure */
+            padding: 1% 2%; /* Padding 1% top bot, 2% right left */
+            border-radius: 0.5rem; /* Bordure arrondie */
+            cursor: pointer; /* Curseur en forme de main pour montrer un clic possible */
         }
-        .btn:hover {
-            background-color: #0056b3;
+        .btn:hover { /* Sélecteur de style de la classe btn au survol(hover) */
+            background-color: #0056b3; /* Couleur de fond du bouton au survol */
         }
-        #result {
-            margin-top: 2%;
+        #result { /* Sélecteur de style de l'id result */
+            margin-top: 2%; /* Marge en haut */
         }
-        .header-container {
-            position: relative;
-            text-align: center;
-            margin-bottom: 2%;
+        .header-container { /* Sélecteur de style de la classe header-container */
+            position: relative; /* Position relative, reste dans le flux global du doc  */
+            text-align: center; /* Aligne le texte au centre */
+            margin-bottom: 2%; /* Marge en bas */
         }
-        .header-container h1 {
-            margin: 0;
-            font-size: 185%;
-            text-align: center;
-            width: 100%;
+        .header-container h1 { /* Sélecteur de style de h1 dans la classe header container */
+            margin: 0; /* Pas de marge */
+            font-size: 185%; /* Taille de police (grannnd) */
+            text-align: center; /* Aligne le texte au centre */
+            width: 100%; /* Largeur */
         }
-        .btn-secondary {
-            position: absolute;
-            left: 0;
-            top: 0;
-            background-color: #6c757d;
-            color: white;
-            padding: 1% 2%;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
+        .btn-secondary { /* Sélecteur de style de la classe btn-secondary */
+            position: absolute; /* Position absolue, sort du flux global du doc, on peut globalement faire ce qu'on veut avec */
+            left: 0; /* Position à gauche */
+            top: 0; /* Position en haut */
+            background-color: #6c757d; /* Couleur de fond */
+            color: white; /* Couleur du texte */
+            padding: 1% 2%; /* Padding 1% top bot, 2% right left */
+            border: none; /* Pas de bordure */
+            border-radius: 0.5rem; /* Bordure arrondie */
+            cursor: pointer; /* Curseur en forme de main */
         }
-        .btn-secondary:hover {
-            background-color: #5a6268;
+        .btn-secondary:hover { /* Sélecteur de style de la classe btn-secondary au survol(hover) */
+            background-color: #5a6268; /* Couleur de fond au survol */
         }
-        @media (max-width: 1200px) {
-            .form-container {
-                width: 60%;
+        @media (max-width: 1200px) { /* Media query pour les écrans de 1200px et moins */
+            .form-container { /* Sélecteur de style de la classe form-container */
+                width: 60%; /* Largeur de container */
             }
-            h1 {
-                font-size: 2.2%;
-            }
-        }
-        @media (max-width: 768px) {
-            .form-container {
-                width: 80%;
-                padding: 5%;
-            }
-            h1 {
-                font-size: 160%;
-            }
-            .btn, .btn-secondary {
-                padding: 2% 4%;
+            h1 { /* Sélecteur de style de la balise h1 */
+                font-size: 2.2%; /* Taille de police */
             }
         }
-        @media (max-width: 480px) {
-            .form-container {
-                width: 95%;
-                padding: 8%;
+        @media (max-width: 768px) { /* Media query pour les écrans de 768px et moins */
+            .form-container { /* Sélecteur de style de la classe form-container */
+                width: 80%; /* Largeur de container */
+                padding: 5%; /* Padding global */
             }
-            h1 {
-                font-size: 140%;
+            h1 { /* Sélecteur de style de la balise h1 */
+                font-size: 160%; /* Taille de police */ 
             }
-            input, select {
-                font-size: 90%;
-            }
-            .btn, .btn-secondary {
-                padding: 3% 5%;
-            }
-            .btn-secondary {
-                font-size: 80%;
+            .btn, .btn-secondary { /* Sélecteur de style de la classe btn et btn-secondary */
+                padding: 2% 4%; /* Padding 2% top bot, 4% right left */
             }
         }
-    </style>
+        @media (max-width: 480px) { /* Media query pour les écrans de 480px et moins */
+            .form-container { /* Sélecteur de style de la classe form-container */
+                width: 95%; /* Largeur de container */
+                padding: 8%; /* Padding global */
+            }
+            h1 { /* Sélecteur de style de la balise h1 */
+                font-size: 140%; /* Taille de police */
+            } 
+            input, select { /* Sélecteur de style des balises input et select */
+                font-size: 90%; /* Taille de police */
+            }
+            .btn, .btn-secondary { /* Sélecteur de style de la classe btn et btn-secondary */
+                padding: 3% 5%; /* Padding 3% top bot, 5% right left */
+            }
+            .btn-secondary { /* Sélecteur de style de la classe btn-secondary */
+                font-size: 80%; /* Taille de police */
+            }
+        }
+    </style> <!-- Fermeture de la balise style -->
 </head>
 <body>
 
