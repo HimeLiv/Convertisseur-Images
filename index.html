@@ -124,35 +124,35 @@
             }
         }
     </style> <!-- Fermeture de la balise style -->
-</head>
-<body>
+</head> <!-- Fermeture de l'en-tête -->
+<body> <!-- Corps du doc // Ouverture de la balise body -->
 
-    <div class="container">
-        <div class="form-container">
-            <div class="header-container">
-                <a href="../"><button class="btn-secondary">Revenir au menu principal</button></a>
-                <h1>Convertisseur d'images</h1>
-            </div>
-            <form id="imageForm" action="/convert" method="POST" enctype="multipart/form-data">
-
-                <label for="fileInput">Choisissez une image :</label>
-                <input type="file" id="fileInput" name="fileInput" accept="image/*, application/pdf" required>
+    <div class="container"> <!-- Création d'une div de classe container -->
+        <div class="form-container"> <!-- Création d'une div de classe form-container -->
+            <div class="header-container"> <!-- Création d'une div de classe header-container -->
+                <a href="../"><button class="btn-secondary">Revenir au menu principal</button></a> <!-- Bouton de retour au menu principal, fait avec une balise a (lien) et un bouton à l'intérieur -->
+                <h1>Convertisseur d'images</h1> <!-- Texte affiché en haut du formulaire -->
+            </div> <!-- Fermeture de la div de classe header-container -->
+            <form id="imageForm" action="/convert" method="POST" enctype="multipart/form-data"> <!-- Ouverture du formulaire, avec comme id imageForm, un encodage multipart/form-data, une méthode POST et une action convert -->
+            <!-- action ="" c'est l'envoie du formulaire à une adresse inexistante afin de le stocker, méthode || method post envoie les données au serveur, et enctype précise comment encoder les données au serveur-->
+                <label for="fileInput">Choisissez une image :</label> <!-- Label pour le fichier, relié à "fileInput avec "for" -->
+                <input type="file" id="fileInput" name="fileInput" accept="image/*, application/pdf" required> <!-- Balise d'input de type fichier, pour les fichiers, obligatoire, qui n'accepte que les images et les pdf, avec comme nom pour le serveur FileInput-->
                 
-                <label for="format">Convertir au format :</label>
-                <select id="format" name="format">
-                    <option value="jpg">JPG (Anciennement JPEG)</option>
-                    <option value="png">PNG</option>
-                    <option value="webp">WEBP</option>
-                    <option value="pdf">PDF</option>  
-                </select>
+                <label for="format">Convertir au format :</label> <!-- Label pour le format, relié à "format" avec "for" -->
+                <select id="format" name="format"> <!-- Création d'un menu déroulant "format"-->
+                    <option value="jpg">JPG (Anciennement JPEG)</option> <!-- Option du menu déroulant "jpg" -->
+                    <option value="png">PNG</option> <!-- Option du menu déroulant "png" -->
+                    <option value="webp">WEBP</option> <!-- Option du menu déroulant "webp" -->
+                    <option value="pdf">PDF</option> <!-- Option du menu déroulant "pdf" -->
+                </select> <!-- Fermeture de la balise du menu déroulant "format" -->
                 
-                <button type="submit" class="btn">Convertir</button>
-            </form>
-            <div id="result"></div>
-        </div>
-    </div>
+                <button type="submit" class="btn">Convertir</button> <!-- Bouton qui sert à envoyer la requête de conversion après que tout soit sélectionné, validation du formulaire--> 
+            </form> <!-- Fermeture du formulaire -->
+            <div id="result"></div> <!-- Création d'une div d'id result, utlisée pour les boutons plus tard -->
+        </div> <!-- Fermeture de la div de classe form-container -->
+    </div> <!-- Fermeture de la div de classe container -->
 
-        <script>
+        <script> <!-- Ouverture de la balise script -->
         document.getElementById('imageForm').addEventListener('submit', async function (e) { 
             e.preventDefault();
 
@@ -336,7 +336,7 @@
 
             resultDiv.appendChild(resetButton);
         }
-    </script>
+    </script> <!-- Fermeture de la balise script -->
 
-</body>
-</html>
+</body> <!-- Fermeture de la balise body -->
+</html> <!-- Fermeture de la balise html -->
