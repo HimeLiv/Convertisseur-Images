@@ -153,16 +153,16 @@
     </div> <!-- Fermeture de la div de classe container -->
 
         <script> // Ouverture de la balise script
-        document.getElementById('imageForm').addEventListener('submit', async function (e) { 
-            e.preventDefault();
+        document.getElementById('imageForm').addEventListener('submit', async function (e) { // Regarde si le formulaire est envoyé ou non
+            e.preventDefault(); // Empêcher le rechargement de la page
 
-            const fileInput = document.getElementById('fileInput').files[0];
-            const format = document.getElementById('format').value;
+            const fileInput = document.getElementById('fileInput').files[0]; // Constante fileInput qui récupère le fichier choisi ex : image., doc.
+            const format = document.getElementById('format').value; // Constante format qui récupère la valeur du format choisi ex : jpg, png, webp, pdf
 
-            if (!fileInput) {
-                alert('Veuillez sélectionner un fichier.');
-                return;
-            }
+            if (!fileInput) { // Boucle SI pour vérifier qu'un fichier soit bien sélectionner
+                alert('Veuillez sélectionner un fichier.'); //Message d'alerte s'il n'y a pas de fichier sélectionné
+                return; // ça, ça sert à rien ?
+            } // Fin de la boucle SI
 
             const reader = new FileReader();
             reader.onload = async function (event) {
@@ -197,6 +197,7 @@
             reader.readAsDataURL(fileInput); // Lire le fichier
         });
 
+        // Ouverture de la fonction pour convertir un PDF en image
         async function convertPdfToImage(pdfDataUrl, format) {
             const pdfjsLib = window['pdfjs-dist/build/pdf'];
 
@@ -227,8 +228,9 @@
 
             // Créer un bouton de téléchargement
             createDownloadButton(blob, `converted-image.${format}`);
-        }
+        } // Fermeture de la fonction pour convertir un PDF en image
 
+        // Ouverture de la fonction pour convertir une image en PDF
         async function convertImageToPdf(imageDataUrl) {
             const pdfLib = window.PDFLib;  // Directement accessible depuis window
             const { PDFDocument } = pdfLib;  // Déstructuration de PDFDocument à partir de pdf-lib
@@ -264,9 +266,9 @@
             
             // Créer un bouton pour télécharger le fichier PDF
             createDownloadButton(pdfBlob, 'converted-image.pdf');
-        }
+        } // Fermeture de la fonction pour convertir une image en PDF
 
-        // Fonction pour convertir une image WEBP en PNG
+        // Ouverture de la fonction pour convertir une image WEBP en PNG
         async function convertWebpToPng(webpDataUrl) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -286,9 +288,9 @@
                 };
             });
         }
-        // Fonction pour convertir une image WEBP en PNG
+        // Fermeture de la fonction pour convertir une image WEBP en PNG
 
-
+        // Ouverture de la fonction pour convertir une image
         async function convertImage(imageDataUrl, format) {
             const img = new Image();
             img.src = imageDataUrl;
@@ -304,8 +306,9 @@
             const mimeType = `image/${format}`;
             const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType));
             createDownloadButton(blob, `converted-image.${format}`);
-        }
+        } // Fermeture de la fonction pour convertir une image
 
+        // Ouverture de la fonction pour créer un bouton de téléchargement, ainsi qu'un bouton nouvelle conversion
         function createDownloadButton(blob, filename) {
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = '';
@@ -335,7 +338,8 @@
             };
 
             resultDiv.appendChild(resetButton);
-        }
+        } // Fermeture de la fonction pour créer un bouton de téléchargement, ainsi qu'un bouton nouvelle conversion
+        
     </script> <!-- Fermeture de la balise script -->
 
 </body> <!-- Fermeture de la balise body -->
