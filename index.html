@@ -154,7 +154,7 @@
 
         <script> // Ouverture de la balise script
         document.getElementById('imageForm').addEventListener('submit', async function (e) { // Regarde si le formulaire est envoyé ou non
-            e.preventDefault(); // Empêcher le rechargement de la page
+            e.preventDefault(); // Empêche le rechargement de la page
 
             const fileInput = document.getElementById('fileInput').files[0]; // Constante fileInput qui récupère le fichier choisi ex : image., doc.
             const format = document.getElementById('format').value; // Constante format qui récupère la valeur du format choisi ex : jpg, png, webp, pdf
@@ -164,181 +164,155 @@
                 return; // ça, ça sert à rien ?
             } // Fin de la boucle SI
 
-            const reader = new FileReader();
-            reader.onload = async function (event) {
-                const fileType = fileInput.type;
+            const reader = new FileReader(); // Création d'un nouveau file reader, servant à lire les fichiers
+            reader.onload = async function (event) { // Fonction qui s'active lorsqu'un fichier est chargé, prend en paramètre event
+                const fileType = fileInput.type; // Type du fichier sélectionné
 
                 const formatTypes = { // Types des formats
-                    jpg: 'image/jpeg',
-                    png: 'image/png',
-                    webp: 'image/webp',
-                    pdf: 'application/pdf'
-                };
+                    jpg: 'image/jpeg', // jpg = image/jpeg
+                    png: 'image/png', // png = image/png
+                    webp: 'image/webp', // webp = image/webp
+                    pdf: 'application/pdf' // pdf = application/pdf
+                }; // Fin de la constante formatTypes
 
-                if (fileType === formatTypes[format]) { // Vérification de format
-                    confirm('Le fichier sélectionné est déjà dans le format demandé.');
-                } else if (fileType === 'application/pdf' && (format === 'jpg' || format === 'png' || format === 'webp')) {
-                    // PDF vers Image
-                    await convertPdfToImage(event.target.result, format);
-                } else if ((fileType.startsWith('image/') && fileType !== 'application/pdf') && format === 'pdf') {
-                    // Image (inclut WEBP) vers PDF
-                    await convertImageToPdf(event.target.result);
-                } else if (fileType === 'image/webp' && format === 'pdf') {
-                    // WEBP vers PDF
-                    await convertImageToPdf(event.target.result);
-                } else if (fileType.startsWith('image/')) {
-                    // Autres conversions Image vers Image
-                    await convertImage(event.target.result, format);
-                } else {
-                    alert("Le type de fichier sélectionné n'est pas supporté.");
-                }
-            };
+                if (fileType === formatTypes[format]) { // Vérification de format du fichier
+                    alert('Le fichier sélectionné est déjà dans le format demandé.'); // Message d'alerte si le fichier est déjà dans le format demandé
+                } else if (fileType === 'application/pdf' && (format === 'jpg' || format === 'png' || format === 'webp')) { // PDF vers Image
+                    await convertPdfToImage(event.target.result, format); // Appel de la fonction convertPdfToImage avec les paramètres event.target.result et format
+                } else if ((fileType.startsWith('image/') && fileType !== 'application/pdf') && format === 'pdf') { // Image (inclut WEBP) vers PDF
+                    await convertImageToPdf(event.target.result); // Appel de la fonction convertImageToPdf avec le paramètre event.target.result
+                } else if (fileType === 'image/webp' && format === 'pdf') { // WEBP vers PDF
+                    await convertImageToPdf(event.target.result); // Appel de la fonction convertImageToPdf avec le paramètre event.target.result
+                } else if (fileType.startsWith('image/')) { // Autres conversions Image vers Image
+                    await convertImage(event.target.result, format); // Appel de la fonction convertImage avec les paramètres event.target.result et format
+                } else { // Else pour les autres fichiers
+                    alert("Le type de fichier sélectionné n'est pas supporté."); // Message d'alerte si le type de fichier n'est pas supporté
+                } // Fin de la boucle SI
+            }; // Fin de la fonction qui s'active lorsqu'un fichier est chargé
 
-            reader.readAsDataURL(fileInput); // Lire le fichier
+            reader.readAsDataURL(fileInput); // Lire le fichier en tant que Data URL
         });
 
         // Ouverture de la fonction pour convertir un PDF en image
-        async function convertPdfToImage(pdfDataUrl, format) {
-            const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        async function convertPdfToImage(pdfDataUrl, format) { // Paramètres : pdfDataUrl et format
+            const pdfjsLib = window['pdfjs-dist/build/pdf']; // Récupère pdfjsLib de window
+            const pdf = await pdfjsLib.getDocument({ data: atob(pdfDataUrl.split(',')[1]) }).promise; // Charge le PDF à partir de l'URL
+            const page = await pdf.getPage(1); // Récupére la première page du PDF
+            const viewport = page.getViewport({ scale: 2 }); // Ajuste le scale pour une meilleure résolution
 
-            // Charger le PDF
-            const pdf = await pdfjsLib.getDocument({ data: atob(pdfDataUrl.split(',')[1]) }).promise;
+            const canvas = document.createElement('canvas'); // Crée un canvas
+            const context = canvas.getContext('2d'); // Récupère le contexte de rendu 2D du canvas sous le nom de context
+            canvas.width = viewport.width; // Ajuste la largeur du canvas à celle de la page
+            canvas.height = viewport.height; // Ajuste la hauteur du canvas à celle de la page
 
-            // Récupérer la première page
-            const page = await pdf.getPage(1);
-            const viewport = page.getViewport({ scale: 2 }); // Ajuster le scale pour une meilleure résolution
+            const renderContext = { // Contexte de rendu (c'est à dire les paramètres de rendu)
+                canvasContext: context, // Contexte du canvas 
+                viewport: viewport, // Zone de visualisation de la page
+            }; // Fermeture de la constante renderContext
 
-            // Créer un canvas pour le rendu
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
+            await page.render(renderContext).promise; // Attend que la page soit rendue sur le canvas
 
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport,
-            };
+            const mimeType = `image/${format}`; // Définit le type MIME, ici image/ + le format
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType)); // Convertit le canvas en Blob (fichier de stockage de données brutes en binaire)
 
-            // Rendre la page dans le canvas
-            await page.render(renderContext).promise;
-
-            // Convertir le canvas en image Blob
-            const mimeType = `image/${format}`;
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType));
-
-            // Créer un bouton de téléchargement
-            createDownloadButton(blob, `converted-image.${format}`);
+            createDownloadButton(blob, `converted-image.${format}`); // Crée un bouton pour télécharger le fichier converti
         } // Fermeture de la fonction pour convertir un PDF en image
 
         // Ouverture de la fonction pour convertir une image en PDF
-        async function convertImageToPdf(imageDataUrl) {
-            const pdfLib = window.PDFLib;  // Directement accessible depuis window
-            const { PDFDocument } = pdfLib;  // Déstructuration de PDFDocument à partir de pdf-lib
+        async function convertImageToPdf(imageDataUrl) { // Paramètre : imageDataUrl
+            const pdfLib = window.PDFLib;  // Récupère PDFLib de window
+            const { PDFDocument } = pdfLib;  // Récupère PDFDocument de pdfLib
+            const pdfDoc = await PDFDocument.create(); // Crée un nouveau PDF
+            const imgBytes = await fetch(imageDataUrl).then(res => res.arrayBuffer()); // Charge l'image à partir du Data URL
 
-            // Créer un nouveau PDF
-            const pdfDoc = await PDFDocument.create();
+            let pdfImg; // Déclare la variable pdfImg
+            if (imageDataUrl.startsWith('data:image/webp')) { // Si pour savoir si l'image est au format WEBP
+                // Convertit WEBP en PNG via un canvas
+                const convertedPngDataUrl = await convertWebpToPng(imageDataUrl); // Appel de la fonction convertWebpToPng avec le paramètre imageDataUrl
+                const pngBytes = await fetch(convertedPngDataUrl).then(res => res.arrayBuffer()); // Récupère les données de l'image convertie sous le nom de pngBytes
+                pdfImg = await pdfDoc.embedPng(pngBytes); // Intègre l'image PNG convertie si c'est du WEBP
+            } else { 
+                pdfImg = await pdfDoc.embedPng(imgBytes); // Intègre l'image directement si ce n'est pas WEBP
+            } // Fermeture de la boucle SI
 
-            // Charger l'image à partir du Data URL
-            const imgBytes = await fetch(imageDataUrl).then(res => res.arrayBuffer());
-
-            // Vérifier si l'image est au format WEBP
-            let pdfImg;
-            if (imageDataUrl.startsWith('data:image/webp')) {
-                // Convertir WEBP en PNG via un canvas
-                const convertedPngDataUrl = await convertWebpToPng(imageDataUrl);
-                const pngBytes = await fetch(convertedPngDataUrl).then(res => res.arrayBuffer());
-                pdfImg = await pdfDoc.embedPng(pngBytes); // Embed l'image PNG convertie
-            } else {
-                pdfImg = await pdfDoc.embedPng(imgBytes); // Embed l'image directement si ce n'est pas WEBP
-            }
-
-            const { width, height } = pdfImg.scale(1); // Ajuster les dimensions de l'image
-
-            // Ajouter une page avec les dimensions de l'image
-            const page = pdfDoc.addPage([width, height]);
-            page.drawImage(pdfImg, { x: 0, y: 0, width, height }); // Dessiner l'image sur la page
-
-            // Sauvegarder le PDF
-            const pdfBytes = await pdfDoc.save();
-
-            // Créer un Blob pour le téléchargement
-            const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
-            
-            // Créer un bouton pour télécharger le fichier PDF
-            createDownloadButton(pdfBlob, 'converted-image.pdf');
+            const { width, height } = pdfImg.scale(1); // Ajuste les dimensions de l'image
+            const page = pdfDoc.addPage([width, height]); // Ajoute une page au PDF avec les dimensions de l'image
+            page.drawImage(pdfImg, { x: 0, y: 0, width, height }); // Dessine l'image sur la page
+            const pdfBytes = await pdfDoc.save(); // Sauvegarde le PDF
+            const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' }); // Crée un Blob pour le téléchargement
+            createDownloadButton(pdfBlob, 'converted-image.pdf'); // Crée un bouton pour télécharger le fichier PDF
         } // Fermeture de la fonction pour convertir une image en PDF
 
         // Ouverture de la fonction pour convertir une image WEBP en PNG
-        async function convertWebpToPng(webpDataUrl) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.src = webpDataUrl;
+        async function convertWebpToPng(webpDataUrl) { // Paramètre : webpDataUrl
+            return new Promise((resolve) => { // Crée une promesse, qui est une opération asynchrone qui peut être en attente, en cours ou terminée
+                const img = new Image(); // Crée une nouvelle image
+                img.src = webpDataUrl; // Récupère l'image WEBP
 
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
+                img.onload = function () { // Fonction qui s'active lorsqu'une image est chargée
+                    const canvas = document.createElement('canvas'); // Crée un canvas
+                    canvas.width = img.width; // Ajuste la largeur du canvas à celle de l'image
+                    canvas.height = img.height; // Ajuste la hauteur du canvas à celle de l'image
 
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
+                    const ctx = canvas.getContext('2d'); // Récupère le contexte de rendu 2D du canvas sous le nom de ctx
+                    ctx.drawImage(img, 0, 0); // Dessine l'image sur le canvas
 
-                    // Convertir en PNG
-                    const pngDataUrl = canvas.toDataURL('image/png');
-                    resolve(pngDataUrl);
-                };
+                    const pngDataUrl = canvas.toDataURL('image/png'); // Convertit le canvas en image PNG
+                    resolve(pngDataUrl); // Résoudre la promesse avec l'URL de l'image PNG
+                }; // Fermeture de la fonction qui s'active lorsqu'une image est chargée
             });
-        }
-        // Fermeture de la fonction pour convertir une image WEBP en PNG
+        } // Fermeture de la fonction pour convertir une image WEBP en PNG
+        
 
         // Ouverture de la fonction pour convertir une image
-        async function convertImage(imageDataUrl, format) {
-            const img = new Image();
-            img.src = imageDataUrl;
+        async function convertImage(imageDataUrl, format) { // Paramètres : imageDataUrl et format
+            const img = new Image(); // Crée une nouvelle image
+            img.src = imageDataUrl; // Récupère l'image
 
-            await new Promise(resolve => img.onload = resolve); // Attendre le chargement de l'image
+            await new Promise(resolve => img.onload = resolve); // Attends le chargement de l'image
 
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
+            const canvas = document.createElement('canvas'); // Crée un canvas
+            canvas.width = img.width; // Ajuste la largeur du canvas à celle de l'image
+            canvas.height = img.height; // Ajuste la hauteur du canvas à celle de l'image
+            const ctx = canvas.getContext('2d'); // Récupère le contexte de rendu 2D du canvas sous le nom de ctx
+            ctx.drawImage(img, 0, 0); // Dessine l'image sur le canvas
 
-            const mimeType = `image/${format}`;
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType));
-            createDownloadButton(blob, `converted-image.${format}`);
+            const mimeType = `image/${format}`; // Définit le type MIME
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType)); // Convertit le canvas en Blob (fichier de stockage de données brutes en binaire)
+            createDownloadButton(blob, `converted-image.${format}`); // Crée un bouton de téléchargement pour le fichier converti
         } // Fermeture de la fonction pour convertir une image
 
         // Ouverture de la fonction pour créer un bouton de téléchargement, ainsi qu'un bouton nouvelle conversion
-        function createDownloadButton(blob, filename) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '';
+        function createDownloadButton(blob, filename) { // paramètres : blob et filename
+            const resultDiv = document.getElementById('result'); // Récupère l'élément de l'id result sous le nom de resultDiv
+            resultDiv.innerHTML = ''; // Mets le contenu de la div result à vide
 
             const downloadButton = document.createElement('button');
-            downloadButton.className = 'btn';
-            downloadButton.innerText = 'Télécharger le fichier converti';
-            downloadButton.style.marginTop = '2%';
-            downloadButton.style.marginLeft = '-6%';
-            downloadButton.onclick = function () {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = filename;
-                link.click();
-            };
+            downloadButton.className = 'btn'; // Ajoute la classe btn à l'élément downloadbutton
+            downloadButton.innerText = 'Télécharger le fichier converti'; // Ajoute le texte "Télécharger le fichier converti" à l'élément downloadButton
+            downloadButton.style.marginTop = '2%'; // Ajoute une marge en haut de 2% à l'élément downloadButton
+            downloadButton.style.marginLeft = '-6%'; // Ajoute une marge à gauche de -6% à l'élément downloadbutton (ça fonctionne ?)
+            downloadButton.onclick = function () { // (Ouverture de la fonction) | Appelle la fonction lorsqu'on clique sur le downloadButton
+                const link = document.createElement('a'); // Créer un élément a sous le nom de "link"
+                link.href = URL.createObjectURL(blob); // Créer un lien vers le paramètre blob
+                link.download = filename; // Télécharger le fichier sous le nom du paramètre filename
+                link.click(); // Cliquer sur le lien ???
+            }; // Fermeture de la fonction pour télécharger le fichier converti
 
-            resultDiv.appendChild(downloadButton);
+            resultDiv.appendChild(downloadButton); // Ajouter le bouton de téléchargement dans la div result
 
-            const resetButton = document.createElement('button');
-            resetButton.className = 'btn';
-            resetButton.style.marginTop = '2%';
-            resetButton.style.marginLeft = '5%';
-            resetButton.innerText = 'Nouvelle conversion';
-            resetButton.onclick = function () {
-                document.getElementById('imageForm').reset();
-                resultDiv.innerHTML = '';
-            };
+            const resetButton = document.createElement('button'); // Créer un élément resetbutton 
+            resetButton.className = 'btn'; // Ajoute la classe btn à l'élément resetbutton
+            resetButton.style.marginTop = '2%'; // Ajoute une marge en haut de 2% à l'élément resetButton
+            resetButton.style.marginLeft = '5%'; // Ajoute une marge à gauche de 5% à l'élément resetButton
+            resetButton.innerText = 'Nouvelle conversion'; // Ajoute le texte "Nouvelle conversion" à l'élément resetButton
+            resetButton.onclick = function () { // (Ouverture de la fonction) | Appelle la fonction lorsqu'on clique sur le resetButton
+                document.getElementById('imageForm').reset(); // Réinitialise le formulaire, renvoie à la base du formulaire
+                resultDiv.innerHTML = ''; // Réinitialise le contenu de la div result
+            }; // Fermeture de la fonction pour réinitialiser le formulaire
 
-            resultDiv.appendChild(resetButton);
-        } // Fermeture de la fonction pour créer un bouton de téléchargement, ainsi qu'un bouton nouvelle conversion
+            resultDiv.appendChild(resetButton); // Ajoute le bouton "Nouvelle conversion", dans le flux de la div result
+        } // Fermeture de la fonction pour créer un bouton de téléchargement
         
     </script> <!-- Fermeture de la balise script -->
 
